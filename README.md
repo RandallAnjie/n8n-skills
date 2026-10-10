@@ -9,7 +9,7 @@ Built by the n8n team to pair with n8n's instance-level MCP server. Your coding 
 **What's inside:**
 
 - **The n8n MCP connection, set up for you** (Claude Code): the plugin bundles the `n8n-mcp` server and prompts for your instance URL at install, so there's no manual MCP config. Codex adds it with one `codex mcp add`.
-- **13 capability skills** covering best practices across the full workflow lifecycle: sub-workflow reuse, expressions, loops and pagination, AI agents, error handling, credentials, Data Tables, debugging, and more.
+- **14 capability skills** covering best practices across the full workflow lifecycle: sub-workflow reuse, expressions, loops and pagination, AI agents, error handling, credentials, Data Tables, debugging, plus a PoC fast path from a one-line idea to a demoable workflow.
 - **50+ reference docs and worked examples** loaded on demand: per-node gotchas, decision trees, and copy-pasteable workflow JSON / TypeScript SDK snippets.
 - **A SessionStart hook** that loads the protocol on every session, including a compact reference for every n8n MCP tool.
 - **PreToolUse hooks** that nudge your agent to consult the matching skill before high-impact MCP calls.
@@ -115,6 +115,7 @@ and follow its routing into the matching capability skill before acting.
 
 | Skill | When it activates |
 |---|---|
+| `n8n-poc-quickstart` | PoC, prototype, demo, vibe, spike: one-line idea to a runnable workflow |
 | `n8n-workflow-lifecycle-official` | Starting, designing, organizing, or finishing a workflow |
 | `n8n-subworkflows-official` | Anything reusable, multi-step builds |
 | `n8n-extending-mcp-official` | Need capabilities the MCP doesn't have |
@@ -129,7 +130,7 @@ and follow its routing into the matching capability skill before acting.
 | `n8n-data-tables-official` | Data Tables: schemas, dedup, persistent state |
 | `n8n-debugging-official` | Things break |
 
-A 14th meta-skill, `using-n8n-skills-official`, is loaded by the SessionStart hook in plugins and routes your agent to the right capability skill on every n8n task.
+A 15th meta-skill, `using-n8n-skills-official`, is loaded by the SessionStart hook in plugins and routes your agent to the right capability skill on every n8n task.
 
 ## How it works
 

@@ -9,7 +9,7 @@
   "homepage": "https://github.com/n8n-io/skills",
   "repository": "https://github.com/n8n-io/skills",
   "license": "Apache-2.0",
-  "keywords": ["n8n", "workflow", "automation", "mcp"],
+  "keywords": ["n8n", "workflow", "automation", "mcp", "feishu"],
   "skills": "./skills",
   "hooks": "./hooks/hooks.json"
 }

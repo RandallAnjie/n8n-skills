@@ -9,7 +9,8 @@ Built by the n8n team to pair with n8n's instance-level MCP server. Your coding 
 **What's inside:**
 
 - **The n8n MCP connection, set up for you** (Claude Code): the plugin bundles the `n8n-mcp` server and prompts for your instance URL at install, so there's no manual MCP config. Codex adds it with one `codex mcp add`.
-- **13 capability skills** covering best practices across the full workflow lifecycle: sub-workflow reuse, expressions, loops and pagination, AI agents, error handling, credentials, Data Tables, debugging, and more.
+- **13 official capability skills** covering best practices across the full workflow lifecycle: sub-workflow reuse, expressions, loops and pagination, AI agents, error handling, credentials, Data Tables, debugging, and more.
+- **5 Feishu / 飞书 skills** (this fork) for `n8n-nodes-feishu-suite`: app setup, Bitable workflows, Trigger, AI Agent tools, and troubleshooting.
 - **50+ reference docs and worked examples** loaded on demand: per-node gotchas, decision trees, and copy-pasteable workflow JSON / TypeScript SDK snippets.
 - **A SessionStart hook** that loads the protocol on every session, including a compact reference for every n8n MCP tool.
 - **PreToolUse hooks** that nudge your agent to consult the matching skill before high-impact MCP calls.
@@ -111,6 +112,61 @@ and follow its routing into the matching capability skill before acting.
 
 > *The plugins ship a SessionStart hook that loads the entry-point skill for you. Plain skill installs don't have that hook, so the snippet is what cues your agent to start every n8n task by loading `using-n8n-skills-official`.*
 
+## 如何安装/更新/卸载
+
+给 Cursor / Claude Code 的一键安装。从本仓库 `main` 下载 tarball，按技能扁平安装（一技能一文件夹）。再跑同一条命令即更新。
+
+不要用上游 `n8n-io/skills` 的 marketplace 装飞书技能，那里没有这些 fork 技能。
+
+### macOS / Linux
+
+用户级（Cursor）：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor
+```
+
+Claude Code：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool claude
+```
+
+装到当前仓库（项目级）：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --project
+```
+
+只装飞书技能：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --only feishu
+```
+
+卸载（可与 `--tool` / `--project` / `--only feishu` 组合）：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --uninstall
+```
+
+`--tool both` 同时写 Cursor 和 Claude 路径。`--project /path` 指定仓库目录。
+
+### Windows（PowerShell）
+
+```powershell
+irm https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.ps1 -OutFile install.ps1; .\install.ps1 -Tool cursor
+```
+
+其它组合：`.\install.ps1 -Tool claude`、`.\install.ps1 -Tool cursor -Project .`、`.\install.ps1 -Tool cursor -Only feishu`、`.\install.ps1 -Tool cursor -Uninstall`。
+
+### 路径
+
+| 工具 | 用户级 | 项目级 |
+|---|---|---|
+| Claude Code | `~/.claude/skills/<name>` | `<仓库>/.claude/skills/<name>` |
+| Cursor | `~/.cursor/skills/<name>` | `<仓库>/.cursor/skills/<name>` |
+
 ## Skills inside
 
 | Skill | When it activates |
@@ -128,8 +184,13 @@ and follow its routing into the matching capability skill before acting.
 | `n8n-binary-and-data-official` | Files, images, attachments, vision |
 | `n8n-data-tables-official` | Data Tables: schemas, dedup, persistent state |
 | `n8n-debugging-official` | Things break |
+| `feishu-n8n-setup` | First Feishu / 飞书 app, scopes, version publish, Feishu Suite API Test |
+| `feishu-bitable-workflows` | Bitable / 多维表格: webhook, schedule, upsert, batch, field formats |
+| `feishu-bitable-trigger` | Bitable record/field change starts a workflow |
+| `feishu-bitable-ai-agent` | Feishu Suite / Base as an n8n AI Agent tool |
+| `feishu-n8n-troubleshooting` | Feishu node errors: 99991672, 40004, rate limits, timezone |
 
-A 14th meta-skill, `using-n8n-skills-official`, is loaded by the SessionStart hook in plugins and routes your agent to the right capability skill on every n8n task.
+A 19th meta-skill, `using-n8n-skills-official`, is loaded by the SessionStart hook in plugins and routes your agent to the right capability skill on every n8n task.
 
 ## How it works
 

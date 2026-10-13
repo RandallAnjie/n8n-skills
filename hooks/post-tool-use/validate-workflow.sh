@@ -16,6 +16,7 @@
 # - n8n-error-handling-official: webhook OR respond OR scheduleTrigger OR chatTrigger OR agent
 # - n8n-workflow-lifecycle-official (readability): more than 6 nodes
 # - n8n-agents-official: LangChain agent node present
+# - n8n-poc-quickstart: name prefix PoC: or tag poc (graduation path, not blockers)
 #
 # Header and closing gate fire always.
 # Fires every call (no dedup).
@@ -60,6 +61,7 @@ HAS_SCHEDULE=0;        has_str "n8n-nodes-base.scheduleTrigger"       && HAS_SCH
 HAS_CHAT_TRIGGER=0;    has_str "langchain.chatTrigger"                && HAS_CHAT_TRIGGER=1
 HAS_NEWCRED=0;         has_str "newCredential("                       && HAS_NEWCRED=1
 HAS_DOLLAR_JSON=0;     echo "$CODE" | grep -qE '\$json\.' && HAS_DOLLAR_JSON=1
+HAS_POC=0;             echo "$CODE" | grep -qiE 'PoC:|[[:space:]]poc[[:space:]]|'"'"'poc'"'"'|"poc"' && HAS_POC=1
 
 # Approximate node count via 'type: "n8n-..."' occurrences. Restrict to n8n-
 # prefixed types to avoid double-counting Set node assignment field types
@@ -97,6 +99,7 @@ DETECTED=""
 [ $HAS_HTTP -eq 1 ]           && DETECTED+=" HttpRequest"
 [ $HAS_RESPOND -eq 1 ]        && DETECTED+=" RespondToWebhook"
 [ $HAS_SCHEDULE -eq 1 ]       && DETECTED+=" Schedule"
+[ $HAS_POC -eq 1 ]            && DETECTED+=" PoC"
 [ -z "$DETECTED" ] && DETECTED=" (none of the high-risk node types)"
 
 # Consolidate n8n-expressions-official reasons (Set, DateTime, $json all route to it)
@@ -130,9 +133,21 @@ SUGGESTIONS=""
 - n8n-workflow-lifecycle-official (>6 nodes: sticky notes, descriptions capturing the why)"
 [ $HAS_AGENT -eq 1 ]              && SUGGESTIONS+="
 - n8n-agents-official (LangChain agent detected)"
+[ $HAS_POC -eq 1 ]                && SUGGESTIONS+="
+- n8n-poc-quickstart (PoC name/tag: stay on the fast path; other listed official skills are the graduation path)"
 
 # Compose final output. If nothing relevant was detected, just header + footer.
-if [ -z "$SUGGESTIONS" ]; then
+if [ $HAS_POC -eq 1 ]; then
+  WARNINGS=$(cat <<EOF
+[validate_workflow returned. This looks like a PoC.]
+Workflow analyzed: ${NODE_COUNT} node(s); detected:${DETECTED}.
+
+Stay on n8n-poc-quickstart. The official skills below are the graduation path, not blockers, unless the user asked to ship:${SUGGESTIONS}
+
+Validation passing means the SDK is well-formed. For a PoC, next step is test_workflow with pins, not publish_workflow.
+EOF
+)
+elif [ -z "$SUGGESTIONS" ]; then
   WARNINGS=$(cat <<EOF
 [validate_workflow returned. Validation is necessary, not sufficient.]
 Workflow analyzed: ${NODE_COUNT} node(s); detected:${DETECTED}.

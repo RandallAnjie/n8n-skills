@@ -23,6 +23,8 @@ Trust the skills + live MCP tools (`get_node_types`, `get_workflow_sdk_reference
 
 Unless a user preference overrides it, err on the side of loading too many skills rather than too few. Even a 3-node webhook flow typically needs `n8n-node-configuration-official`, `n8n-expressions-official`, `n8n-error-handling-official`, and `n8n-workflow-lifecycle-official`. Nothing in n8n is too small for skills.
 
+Exception: a PoC / vibe / demo / spike request. Invoke `n8n-poc-quickstart` first. That skill names which production rules to defer. Still call `get_node_types` and still never hardcode secrets.
+
 ## Strong defaults (each skill owns its exceptions)
 
 - **The Code node is a last resort.** Expression first, then arrow function inside Edit Fields, then Code. Code earns its place for multi-source aggregation, libraries, and stateful work. See `n8n-code-nodes-official`.
@@ -36,7 +38,9 @@ These rationalizations cause skills to be skipped. If you catch yourself thinkin
 
 | Thought | Action |
 |---|---|
-| "This workflow is simple, I'll just build it" | Invoke `n8n-workflow-lifecycle-official`. Most "simple" workflows are 10+ nodes by the time they ship. |
+| "This is just a PoC, I'll skip skills" | Invoke `n8n-poc-quickstart`. PoC relaxes polish, not secrets, `get_node_types`, or unpinned side effects. |
+| "User said vibe / prototype / demo, I'll load the full production stack" | Invoke `n8n-poc-quickstart` first. Load lifecycle / error-handling when they ask to ship. |
+| "This workflow is simple, I'll just build it" | Invoke `n8n-workflow-lifecycle-official`. Most "simple" workflows are 10+ nodes by the time they ship. Not a PoC unless they said PoC / demo / vibe / spike. |
 | "I'll add a Set node here to map these fields" | Invoke `n8n-expressions-official`. Set nodes feeding only 0 or 1 downstream consumer are the most common antipattern in this entire pack. |
 | "I'll just use a Code node, it's easier" | Invoke `n8n-code-nodes-official`. The bar is high. Most reaches for Code can be expressions or Edit Fields with arrow functions. |
 | "Validation passed, I'm ready to publish" | Invoke `n8n-workflow-lifecycle-official` and walk `VALIDATION_CHECKLIST.md` section 2 (the antipattern scan). Validation passing is necessary, not sufficient. |
@@ -62,6 +66,7 @@ Invoke via the Skill tool. Trigger column = when to invoke.
 
 | Skill | Trigger |
 |---|---|
+| `n8n-poc-quickstart` | One-line idea, PoC, prototype, demo, vibe, spike, hackathon. Fast path: simplest trigger, built-in nodes, pin/mock when creds aren't ready. Harden later with the official skills |
 | `n8n-workflow-lifecycle-official` | Starting, designing, organizing, or finishing a workflow. Covers sticky-note conventions, descriptions that capture the *why*, naming, validation checklist, folder management, MCP-access-per-workflow gotcha |
 | `n8n-subworkflows-official` | Anything reusable, multi-step builds, or the user mentions reuse. Search before building, stateless patterns, tag-based discovery convention |
 | `n8n-extending-mcp-official` | You need capabilities the MCP doesn't natively provide. Wrap n8n APIs as workflow tools, with user permission |
@@ -189,7 +194,7 @@ For any n8n task:
 
 `create_workflow_from_code` and `update_workflow` take an optional `skillsUsed: string[]`. Pass it every time so the n8n team can measure plugin impact on MCP output.
 
-- **Contents:** report each skill exactly as the Skill tool names it. Official skills keep the `-official` suffix: `plugin:skill-official` when plugin-namespaced, else bare `skill-official`. The suffix marks those as the n8n-team pack (vs other n8n packs); the plugin prefix marks plugin vs raw-skill usage. Fork-added skills (no `-official` suffix) are reported as named, e.g. `feishu-n8n-setup`.
+- **Contents:** report each skill exactly as the Skill tool names it. Official skills keep the `-official` suffix: `plugin:skill-official` when plugin-namespaced, else bare `skill-official`. The suffix marks those as the n8n-team pack (vs other n8n packs); the plugin prefix marks plugin vs raw-skill usage. Fork-added skills (no `-official` suffix) are reported as named, e.g. `n8n-poc-quickstart`, `feishu-n8n-setup`.
 - **Window:** skills invoked since the last successful create/update call. Resets after each.
 - **Limits:** max 50 entries, each max 128 chars.
 
@@ -204,5 +209,6 @@ A review agent should call `get_workflow_details` first, walk the checklist top 
 - **Can't find a workflow the user is referring to?** If the user built it in the n8n UI, the most common reason is **MCP access isn't enabled on that specific workflow**: UI-created workflows can default to MCP-disabled and stay invisible until the per-workflow toggle is flipped. Ask the user: "Open the workflow in n8n, Settings, toggle MCP access on." (MCP-created workflows default on, so this only applies to UI-built ones.) See the `n8n-workflow-lifecycle-official` skill (`references/MCP_ACCESS_PER_WORKFLOW.md`).
 - The user is right. If they say something's broken, believe them, even if you "know" the workflow is correct. Re-check parameters, fetch the n8n source from `github.com/n8n-io/n8n` to trace logic, find API docs for missing functions. The `n8n-debugging-official` skill walks through this.
 - If no skill fits and the task is non-trivial, ask before guessing.
+- PoC / demo / vibe / spike / "just make it work": `n8n-poc-quickstart` is the primary skill.
 - Feishu / Lark / 飞书 / 多维表格 / Bitable: invoke the matching `feishu-*` skill. First-time credentials go to `feishu-n8n-setup`.
 - These skills are opinionated, but considered best practice by the n8n team. The user can override any opinion by editing the SKILL.md. The plugin is just markdown.

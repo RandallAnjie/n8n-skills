@@ -56,6 +56,7 @@ These rationalizations cause skills to be skipped. If you catch yourself thinkin
 | "I'll fan out these three slow steps to run in parallel" | Invoke `n8n-workflow-lifecycle-official` and read the Execution model section. n8n executes fan-out branches sequentially (top-to-bottom by Y-position), not concurrently. For real concurrency, see `n8n-loops-official` and `n8n-subworkflows-official` (`mode: 'each'` + `waitForSubWorkflow: false`). |
 | "User said which project, I'll just build it" | Invoke `n8n-workflow-lifecycle-official`. Project is not folder. Ask about folder placement BEFORE building. `create_folder` works on a registered instance. If the folder tools are absent, the instance isn't registered, and folders are blocked in the UI too, so the user must register it first (free Community-edition registration in Settings), not create the folder by hand. |
 | "I'll just run `test_workflow` to see what happens" | Invoke `n8n-workflow-lifecycle-official` `references/TESTING.md`. `test_workflow` mocks the trigger only. Slack sends, DB writes, payments all fire for real. Ask the user first when downstreams have side effects. |
+| "User said 飞书 / Feishu / Lark / 多维表格, I'll just HTTP Request" | Invoke `feishu-n8n-setup` if the Feishu Suite API credential is not Test-passed, else the matching `feishu-*` skill. |
 
 **The meta-skill (this document) tells you WHICH skill applies. The Skill tool loads the actual rules.** Reading the meta-skill once at session start is not a substitute for invoking the skill at the moment of decision.
 
@@ -79,6 +80,11 @@ Invoke via the Skill tool. Trigger column = when to invoke.
 | `n8n-binary-and-data-official` | Files, images, attachments. Binary handling patterns, agent-tool boundary, CDN requirement for chat surfaces |
 | `n8n-data-tables-official` | Data Tables: schemas, default columns (id/createdAt/updatedAt), no-FK relational design, dedup, the no-JSON-only-primitives rule, the SDK-vs-UI manual-mapping quirk |
 | `n8n-debugging-official` | Errors, unexpected behavior, "this isn't working". Believe the user, check parameters, fetch n8n source from GitHub |
+| `feishu-n8n-setup` | First Feishu / Lark / 飞书 app, scopes, version publish, Feishu Suite API credential Test |
+| `feishu-bitable-workflows` | Feishu Bitable / 多维表格: webhook write, scheduled query+notify, upsert, batch >500, field write formats |
+| `feishu-bitable-trigger` | Bitable record/field change starts an n8n workflow (Feishu Suite Trigger + drive events) |
+| `feishu-bitable-ai-agent` | Attach Feishu Suite / Feishu Suite Base as an n8n AI Agent tool |
+| `feishu-n8n-troubleshooting` | Feishu node errors: 99991672, 40004, 99992402, rate limits, Asia/Shanghai dates |
 
 ## n8n MCP tools (compact reference)
 
@@ -188,7 +194,7 @@ For any n8n task:
 
 `create_workflow_from_code` and `update_workflow` take an optional `skillsUsed: string[]`. Pass it every time so the n8n team can measure plugin impact on MCP output.
 
-- **Contents:** report each skill exactly as the Skill tool names it. Official skills keep the `-official` suffix: `plugin:skill-official` when plugin-namespaced, else bare `skill-official`. The suffix marks those as the n8n-team pack (vs other n8n packs); the plugin prefix marks plugin vs raw-skill usage. Fork-added skills (no `-official` suffix) are reported as named, e.g. `n8n-poc-quickstart`.
+- **Contents:** report each skill exactly as the Skill tool names it. Official skills keep the `-official` suffix: `plugin:skill-official` when plugin-namespaced, else bare `skill-official`. The suffix marks those as the n8n-team pack (vs other n8n packs); the plugin prefix marks plugin vs raw-skill usage. Fork-added skills (no `-official` suffix) are reported as named, e.g. `n8n-poc-quickstart`, `feishu-n8n-setup`.
 - **Window:** skills invoked since the last successful create/update call. Resets after each.
 - **Limits:** max 50 entries, each max 128 chars.
 
@@ -204,4 +210,5 @@ A review agent should call `get_workflow_details` first, walk the checklist top 
 - The user is right. If they say something's broken, believe them, even if you "know" the workflow is correct. Re-check parameters, fetch the n8n source from `github.com/n8n-io/n8n` to trace logic, find API docs for missing functions. The `n8n-debugging-official` skill walks through this.
 - If no skill fits and the task is non-trivial, ask before guessing.
 - PoC / demo / vibe / spike / "just make it work": `n8n-poc-quickstart` is the primary skill.
+- Feishu / Lark / 飞书 / 多维表格 / Bitable: invoke the matching `feishu-*` skill. First-time credentials go to `feishu-n8n-setup`.
 - These skills are opinionated, but considered best practice by the n8n team. The user can override any opinion by editing the SKILL.md. The plugin is just markdown.

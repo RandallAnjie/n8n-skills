@@ -14,6 +14,7 @@ Built by the n8n team to pair with n8n's instance-level MCP server. Your coding 
 - **50+ reference docs and worked examples** loaded on demand: per-node gotchas, decision trees, and copy-pasteable workflow JSON / TypeScript SDK snippets.
 - **A SessionStart hook** that loads the protocol on every session, including a compact reference for every n8n MCP tool.
 - **PreToolUse hooks** that nudge your agent to consult the matching skill before high-impact MCP calls.
+- **3 Suno Gateway skills** (this fork) for `n8n-nodes-suno-gateway` 0.4.0 (node v3): install/credentials/v1→v3, song recipes, troubleshooting.
 
 ## Prerequisite
 
@@ -116,7 +117,7 @@ and follow its routing into the matching capability skill before acting.
 
 给 Cursor / Claude Code 的一键安装。从本仓库 `main` 下载 tarball，按技能扁平安装（一技能一文件夹）。再跑同一条命令即更新。
 
-不要用上游 `n8n-io/skills` 的 marketplace 装飞书技能，那里没有这些 fork 技能。
+不要用上游 `n8n-io/skills` 的 marketplace 装飞书 / Suno Gateway 技能，那里没有这些 fork 技能。
 
 ### macOS / Linux
 
@@ -144,7 +145,13 @@ curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/instal
 curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --only feishu
 ```
 
-卸载（可与 `--tool` / `--project` / `--only feishu` 组合）：
+只装 Suno Gateway 技能：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --only suno
+```
+
+卸载（可与 `--tool` / `--project` / `--only feishu` / `--only suno` 组合）：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --uninstall
@@ -158,7 +165,7 @@ curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/instal
 irm https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.ps1 -OutFile install.ps1; .\install.ps1 -Tool cursor
 ```
 
-其它组合：`.\install.ps1 -Tool claude`、`.\install.ps1 -Tool cursor -Project .`、`.\install.ps1 -Tool cursor -Only feishu`、`.\install.ps1 -Tool cursor -Uninstall`。
+其它组合：`.\install.ps1 -Tool claude`、`.\install.ps1 -Tool cursor -Project .`、`.\install.ps1 -Tool cursor -Only feishu`、`.\install.ps1 -Tool cursor -Only suno`、`.\install.ps1 -Tool cursor -Uninstall`、`.\install.ps1 -Tool cursor -Only suno -Uninstall`。
 
 ### 路径
 
@@ -189,6 +196,9 @@ irm https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.ps1 -
 | `feishu-bitable-trigger` | Bitable record/field change starts a workflow |
 | `feishu-bitable-ai-agent` | Feishu Suite / Base as an n8n AI Agent tool |
 | `feishu-n8n-troubleshooting` | Feishu node errors: 99991672, 40004, rate limits, timezone |
+| `suno-gateway-setup` | Install n8n-nodes-suno-gateway 0.4.0, Suno Gateway API credential, v1→v3 |
+| `suno-gateway-workflows` | Generate, persona+cover, async poll, download audio, n8n binary source |
+| `suno-gateway-troubleshooting` | ECONNRESET, 节点未安装, 401/403, timeout, 409, 0.4.0 source pitfalls |
 
 A 19th meta-skill, `using-n8n-skills-official`, is loaded by the SessionStart hook in plugins and routes your agent to the right capability skill on every n8n task.
 

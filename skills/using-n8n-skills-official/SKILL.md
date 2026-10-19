@@ -53,6 +53,7 @@ These rationalizations cause skills to be skipped. If you catch yourself thinkin
 | "User said which project, I'll just build it" | Invoke `n8n-workflow-lifecycle-official`. Project is not folder. Ask about folder placement BEFORE building. `create_folder` works on a registered instance. If the folder tools are absent, the instance isn't registered, and folders are blocked in the UI too, so the user must register it first (free Community-edition registration in Settings), not create the folder by hand. |
 | "I'll just run `test_workflow` to see what happens" | Invoke `n8n-workflow-lifecycle-official` `references/TESTING.md`. `test_workflow` mocks the trigger only. Slack sends, DB writes, payments all fire for real. Ask the user first when downstreams have side effects. |
 | "User said 飞书 / Feishu / Lark / 多维表格, I'll just HTTP Request" | Invoke `feishu-n8n-setup` if the Feishu Suite API credential is not Test-passed, else the matching `feishu-*` skill. |
+| "User said Suno / 翻唱 / suno-gateway, I'll just HTTP Request" | Invoke `suno-gateway-setup` if the Suno Gateway API credential is not in place, else `suno-gateway-workflows` / `suno-gateway-troubleshooting`. |
 
 **The meta-skill (this document) tells you WHICH skill applies. The Skill tool loads the actual rules.** Reading the meta-skill once at session start is not a substitute for invoking the skill at the moment of decision.
 
@@ -80,6 +81,9 @@ Invoke via the Skill tool. Trigger column = when to invoke.
 | `feishu-bitable-trigger` | Bitable record/field change starts an n8n workflow (Feishu Suite Trigger + drive events) |
 | `feishu-bitable-ai-agent` | Attach Feishu Suite / Feishu Suite Base as an n8n AI Agent tool |
 | `feishu-n8n-troubleshooting` | Feishu node errors: 99991672, 40004, 99992402, rate limits, Asia/Shanghai dates |
+| `suno-gateway-setup` | Install `n8n-nodes-suno-gateway` 0.4.0, Suno Gateway API (`X-API-Key`), typeVersion 1 shows as not installed |
+| `suno-gateway-workflows` | Suno v3: Generation Create, persona+cover, async Job Get poll, Clip Download / download_url, sourceMode=binary |
+| `suno-gateway-troubleshooting` | Suno errors: ECONNRESET, 401/403, timeout, job error/rejected, 409, Arrange Tempo no-op, Job Wait polls /v2 |
 
 ## n8n MCP tools (compact reference)
 
@@ -205,4 +209,5 @@ A review agent should call `get_workflow_details` first, walk the checklist top 
 - The user is right. If they say something's broken, believe them, even if you "know" the workflow is correct. Re-check parameters, fetch the n8n source from `github.com/n8n-io/n8n` to trace logic, find API docs for missing functions. The `n8n-debugging-official` skill walks through this.
 - If no skill fits and the task is non-trivial, ask before guessing.
 - Feishu / Lark / 飞书 / 多维表格 / Bitable: invoke the matching `feishu-*` skill. First-time credentials go to `feishu-n8n-setup`.
+- Suno / Suno Gateway / 翻唱 / persona+cover: invoke the matching `suno-gateway-*` skill. First-time install and credentials go to `suno-gateway-setup`.
 - These skills are opinionated, but considered best practice by the n8n team. The user can override any opinion by editing the SKILL.md. The plugin is just markdown.

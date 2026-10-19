@@ -120,3 +120,20 @@ e2e 还写过：URL `{text,link}`、日期毫秒、单向关联 + 关联表行�
 3. **下载多维表格附件**：`file_token` 来自上传结果或记录里的附件字段
 
 不要把外部 URL 直接塞进附件字段。文件必须属于当前 Base，否则 `1254303` / `1254069`。
+
+### 大文件：Space `upload_all` / 分片
+
+飞书 `files/upload_all` 上限 **20MB**。示例工作流（Suno 成品 wav）用 **`Feishu Suite Space`**（`n8n-nodes-feishu-suite.feishuSuiteSpace`），不是 Base 的「上传附件到多维表格」：
+
+| 大小 | 操作 | operation | 路径 |
+| --- | --- | --- | --- |
+| ≤20MB | 上传文件 | `uploadFile` | POST `/open-apis/drive/v1/files/upload_all` |
+| >20MB | 分片上传文件 | `chunkUploadFile` | `upload_prepare` → `upload_part` → `upload_finish` |
+
+参数：云空间 `folder_token`，二进制字段默认 `data`。返回 `file_token` 或 `data.file_token`。回写附件列用**字段名称**：
+
+```json
+{"音频文件":[{"file_token":"<token>"}]}
+```
+
+Space 这条路径 `parent_type=explorer`。文件必须挂在当前 Base 时，仍用上面的 **上传附件到多维表格**（`parent_type=bitable_file`，e2e PASS）；那条也受 20MB `upload_all` 限制。

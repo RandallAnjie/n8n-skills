@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Install n8n-skills (and this fork's Feishu skills) into Cursor and/or Claude Code.
+# Install n8n-skills (and this fork's Feishu / Suno Gateway skills) into Cursor and/or Claude Code.
 # Re-running updates. Same flags plus -Uninstall removes what this command would install.
 #
 # Download overrides (for tests / a non-main ref):
@@ -13,7 +13,7 @@ param(
 
     [string]$Project,
 
-    [ValidateSet('feishu', 'Feishu')]
+    [ValidateSet('feishu', 'Feishu', 'suno', 'Suno')]
     [string]$Only,
 
     [switch]$Uninstall
@@ -28,11 +28,12 @@ try {
 
 function Show-Usage {
     @"
-Usage: install.ps1 -Tool cursor|claude|both [-Project [dir]] [-Only feishu] [-Uninstall]
+Usage: install.ps1 -Tool cursor|claude|both [-Project [dir]] [-Only feishu|suno] [-Uninstall]
 
   -Tool cursor|claude|both   Required. Destination tool skill roots.
   -Project [dir]             Project install. dir defaults to the current directory when omitted after the switch in bash; here pass -Project .
   -Only feishu               Only Feishu skills (folders named feishu-*).
+  -Only suno                 Only Suno Gateway skills (folders named suno-gateway-*).
   -Uninstall                 Remove the selected skills from the same destinations.
 
 Claude Code:  ~/.claude/skills/<name>   or   <repo>/.claude/skills/<name>
@@ -43,7 +44,9 @@ Examples:
   .\install.ps1 -Tool claude
   .\install.ps1 -Tool cursor -Project .
   .\install.ps1 -Tool cursor -Only feishu
+  .\install.ps1 -Tool cursor -Only suno
   .\install.ps1 -Tool cursor -Uninstall
+  .\install.ps1 -Tool cursor -Only suno -Uninstall
 "@
 }
 
@@ -111,7 +114,11 @@ try {
     $names = @(
         Get-ChildItem -LiteralPath $skillsDir -Directory |
             Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') } |
-            Where-Object { if ($onlyNorm -eq 'feishu') { $_.Name -like 'feishu-*' } else { $true } } |
+            Where-Object {
+                if ($onlyNorm -eq 'feishu') { $_.Name -like 'feishu-*' }
+                elseif ($onlyNorm -eq 'suno') { $_.Name -like 'suno-gateway-*' }
+                else { $true }
+            } |
             Select-Object -ExpandProperty Name
     )
 

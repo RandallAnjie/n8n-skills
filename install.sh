@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install n8n-skills (and this fork's Feishu skills) into Cursor and/or Claude Code.
+# Install n8n-skills (and this fork's Feishu / Suno Gateway skills) into Cursor and/or Claude Code.
 # Re-running updates. Same flags plus --uninstall removes what this command would install.
 #
 # Download overrides (for tests / a non-main ref):
@@ -20,11 +20,12 @@ UNINSTALL=0
 
 usage() {
   cat <<'EOF'
-Usage: install.sh --tool cursor|claude|both [--project [dir]] [--only feishu] [--uninstall]
+Usage: install.sh --tool cursor|claude|both [--project [dir]] [--only feishu|suno] [--uninstall]
 
   --tool cursor|claude|both   Required. Destination tool skill roots.
   --project [dir]             Project install. dir defaults to the current directory.
   --only feishu               Only Feishu skills (folders named feishu-*).
+  --only suno                 Only Suno Gateway skills (folders named suno-gateway-*).
   --uninstall                 Remove the selected skills from the same destinations.
 
 Claude Code:  ~/.claude/skills/<name>   or   <repo>/.claude/skills/<name>
@@ -35,7 +36,9 @@ Examples:
   curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool claude
   curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --project
   curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --only feishu
+  curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --only suno
   curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --uninstall
+  curl -fsSL https://raw.githubusercontent.com/RandallAnjie/n8n-skills/main/install.sh | bash -s -- --tool cursor --only suno --uninstall
 EOF
 }
 
@@ -71,7 +74,7 @@ while [ $# -gt 0 ]; do
       shift
       ;;
     --only)
-      [ $# -ge 2 ] || die "--only needs feishu"
+      [ $# -ge 2 ] || die "--only needs feishu or suno"
       ONLY=$(printf '%s' "$2" | tr '[:upper:]' '[:lower:]')
       shift 2
       ;;
@@ -99,8 +102,8 @@ case "$TOOL" in
   *) die "--tool must be cursor, claude, or both" ;;
 esac
 
-if [ -n "$ONLY" ] && [ "$ONLY" != "feishu" ]; then
-  die "--only only accepts feishu"
+if [ -n "$ONLY" ] && [ "$ONLY" != "feishu" ] && [ "$ONLY" != "suno" ]; then
+  die "--only only accepts feishu or suno"
 fi
 
 if [ "$USE_PROJECT" -eq 1 ]; then
@@ -152,6 +155,11 @@ for d in "$SKILLS_DIR"/*; do
   if [ "$ONLY" = "feishu" ]; then
     case "$name" in
       feishu-*) ;;
+      *) continue ;;
+    esac
+  elif [ "$ONLY" = "suno" ]; then
+    case "$name" in
+      suno-gateway-*) ;;
       *) continue ;;
     esac
   fi
